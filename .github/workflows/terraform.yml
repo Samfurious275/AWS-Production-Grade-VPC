@@ -1,0 +1,61 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches:
+      - '**'  # Run on every branch
+  pull_request:
+    branches:
+      - 'main'  # Run on PRs to main
+
+jobs:
+  terraform:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    environment: development  # You can use 'production' for main branch
+
+    steps:
+      # Checkout code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      # Setup AWS Credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      # Init Terraform
+      - name: Terraform Init
+        run: terraform init
+        continue-on-error: false
+
+      # Validate Terraform Code
+      - name: Terraform Validate
+        run: terraform validate
+        continue-on-error: false
+
+      # Plan (Read-Only on non-main branches)
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+        continue-on-error: false
+
+      # Only apply if on main branch
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -input=false -auto-approve tfplan
+        continue-on-error: false
+
+      # Cleanup plan file
+      - name: Cleanup
+        if: always()
+        run: rm -f tfplan
