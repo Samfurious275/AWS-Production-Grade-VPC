@@ -1,7 +1,7 @@
 # User Data Script (to install simple web server)
 resource "aws_launch_template" "web" {
   name          = "web-launch-template"
-  image_id      = "ami-0abcdef1234567890" # Use latest Amazon Linux 2
+  image_id      = "ami-0e95a5e2743ec9ec9" # Use latest Amazon Linux 2
   instance_type = var.instance_type
   key_name      = var.key_name
   vpc_security_group_ids = [aws_security_group.web.id]
