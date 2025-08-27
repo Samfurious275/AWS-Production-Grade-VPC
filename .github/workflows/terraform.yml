@@ -9,6 +9,7 @@ on:
       - 'main'  # Run on PRs to main
 
 
+
 jobs:
   terraform:
     name: Terraform Plan
