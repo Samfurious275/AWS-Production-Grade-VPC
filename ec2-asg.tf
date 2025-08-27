@@ -1,6 +1,6 @@
 # User Data Script (to install simple web server)
 resource "aws_launch_template" "web" {
-  name          = "web-launch-template-${github.run_id}"
+  name          = "web-launch-template-1"
   image_id      = "ami-0e95a5e2743ec9ec9" # Use latest Amazon Linux 2
   instance_type = var.instance_type
   key_name      = var.key_name
